@@ -1,6 +1,7 @@
 import React from 'react';
 // import ReactDOM from 'react-dom';
 // import User from 'models/user';
+import swal from 'sweetalert';
 import LoginService from 'services/login-service'
 import './register.css';
 
@@ -44,8 +45,13 @@ export default class Register extends React.Component {
         } else {
             await this.loginService.register(this.state.email, this.state.password, this.state.username)
                 .then(async res => {
-                    console.log('succeed')
-                    this.props.history.push("/login");
+                    swal({
+                        title: "Account created successfully!",
+                        text: "You can go ahead and log in now.",
+                        icon: "success",
+                        timer: 2200,
+                        button: false
+                    }).then(this.props.history.push("/login"))
                 })
         }
     }

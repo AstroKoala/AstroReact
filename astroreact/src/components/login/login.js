@@ -2,6 +2,7 @@ import React from 'react';
 // import ReactDOM from 'react-dom';
 // import User from 'models/user';
 import LoginService from 'services/login-service'
+import swal from 'sweetalert';
 import './login.css';
 
 export default class Login extends React.Component {
@@ -43,6 +44,19 @@ export default class Login extends React.Component {
                     this.props.history.push("/");
                     this.loginService.storeCookie(res.id, res.ipAddress)
                 })
+                .catch(res => {
+                    this.setState({
+                        email: "",
+                        password: ""
+                    })
+                    swal({
+                        title: "Uh-Oh",
+                        text: "Incorrect email and/or password.",
+                        icon: "error",
+                        timer: 2200,
+                        button: false
+                    })
+                })
         }
     }
 
@@ -58,6 +72,24 @@ export default class Login extends React.Component {
             </form>
         );
     }
-}
 
+    // async AlertDismissibleExample() {
+    //     const [show, setShow] = React.useState(true);
+
+    //     if (show) {
+    //         return (
+    //             <Alert variant="danger" onClose={() => setShow(false)} dismissible>
+    //                 <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
+    //                 <p>
+    //                     Change this and that and try again. Duis mollis, est non commodo
+    //                     luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.
+    //                     Cras mattis consectetur purus sit amet fermentum.
+    //         </p>
+    //             </Alert>
+    //         );
+    //     }
+    //     return <Button onClick={() => setShow(true)}>Show Alert</Button>;
+    // }
+
+}
 //this.props.handleuser(usr);
