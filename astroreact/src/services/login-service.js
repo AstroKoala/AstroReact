@@ -20,19 +20,17 @@ export default class LoginService {
     }
 
     createUser(data) {
-        if (data) {
-            let user = new User();
-            user.id = data.id;
-            user.lastName = data.last_name;
-            user.firstName = data.first_name;
-            user.email = data.email;
-            user.age = data.age;
-            user.verified = data.verified;
-            user.username = data.user_name;
-            user.ipAddress = data.ipAddress;
-            console.log(user)
-            return user;
-        } else return new User();
+        let user = new User();
+        user.id = data.id;
+        user.lastName = data.last_name;
+        user.firstName = data.first_name;
+        user.email = data.email;
+        user.age = data.age;
+        user.verified = data.verified;
+        user.username = data.user_name;
+        user.ipAddress = data.ipAddress;
+        console.log(user)
+        return user;
     }
 
     handleError(err) {

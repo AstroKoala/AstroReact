@@ -117,7 +117,7 @@ export default class Main extends React.Component {
                                         render={(props) => <Login {...props} id={this.state.id} firstName={this.state.firstName} lastName={this.state.lastName} ipAddress={this.state.ipAddress} handleuser={this.handler} />} /> */}
                                     {/* {<Route render={() => <Redirect to={{ pathname: "/" }} />} />} */}
                                     {/* <Route render={() => <h2 className="four-oh-four">404 NOT FOUND</h2>} /> */}
-                                    <Route render={() => <Redirect to={{ pathname: "/home" }} />} />
+                                    <Route render={() => <Redirect to={{ pathname: "/" }} />} />
                                 </Switch>
                             </div>
                             : < div className="content">
