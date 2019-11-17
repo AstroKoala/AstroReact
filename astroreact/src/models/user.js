@@ -6,22 +6,26 @@ export default class User {
     email;
     pass;
     verified;
+    username;
+    ipAddress;
 
     User(
         id,
         lastName,
         firstName,
         email,
-        pass,
         age,
-        verified
+        verified,
+        userName,
+        ipAddress
     ) {
         this.id = id;
         this.lastName = lastName;
         this.firstName = firstName;
         this.email = email;
-        this.pass = pass;
         this.age = age;
         this.verified = verified;
+        this.userName = userName;
+        this.ipAddress = ipAddress;
     }
 }

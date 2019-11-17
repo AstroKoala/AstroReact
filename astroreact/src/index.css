@@ -1,6 +1,7 @@
 body {
   background-color: #FFCC00;
   padding: 20px;
+  height: 100%;
   margin: 0;
 }
 h1, h2, p, ul, li {
@@ -37,3 +38,10 @@ ul.header li a {
 .active {
   background-color: #0099FF;
 }
+
+.nav-right {
+  float: right;
+}
+/* .nav-left {
+  float: right;
+} */
