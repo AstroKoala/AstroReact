@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, NavLink, BrowserRouter, Redirect, Switch } from "react-router-dom";
+// import { Navbar, Button } from 'react-bootstrap';
 import { CookiesProvider, Cookies } from 'react-cookie';
-// import User from 'models/user'
 import LoginService from 'services/login-service'
 import Home from "components/home/home";
 import Stuff from "components/stuff/stuff";
@@ -9,12 +9,11 @@ import Contact from "components/contact/contact";
 import Login from "components/login/login";
 import Register from 'components/register/register';
 import User from 'models/user';
-// import { Navbar, Button } from 'react-bootstrap';
 import "./index.css";
 
 export default class Main extends React.Component {
     loginService = new LoginService();
-    cookie = new Cookies(); // id, name, location
+    cookie = new Cookies();
 
     constructor(props) {
         super(props)
@@ -24,7 +23,6 @@ export default class Main extends React.Component {
         // Set some state
         this.state = {
             loggedIn: this.checkLoggedIn(),
-            //user: this.usr,
             id: this.cookie.get('id'),
             email: '',
             pass: '',

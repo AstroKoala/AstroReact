@@ -1,6 +1,4 @@
 import React from 'react';
-// import ReactDOM from 'react-dom';
-// import User from 'models/user';
 import LoginService from 'services/login-service'
 import swal from 'sweetalert';
 import './login.css';
