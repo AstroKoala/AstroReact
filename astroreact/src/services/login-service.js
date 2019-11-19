@@ -11,12 +11,9 @@ export default class LoginService {
     async ipLookUp() {
         return $.ajax('http://ip-api.com/json')
             .then(response => {
-                //this.cookie.set('location', response.query);
                 return response.query;
-                ////console.log('setting ' + response.query)
-                //this.setState({ ipAddr: response.query });
             })
-            .catch(err => console.log(err));
+            .catch(err => { return err });
     }
 
     createUser(data) {
@@ -28,8 +25,6 @@ export default class LoginService {
         user.age = data.age;
         user.verified = data.verified;
         user.username = data.user_name;
-        user.ipAddress = data.ipAddress;
-        console.log(user)
         return user;
     }
 
@@ -38,7 +33,7 @@ export default class LoginService {
     }
 
     //returns a user
-    async login(email, password, ipAddr) {
+    async login(email, password) {
         return await axios.get(Config.apiUrl + '/login', {
             crossdomain: true,
             withCredentials: true,
@@ -46,14 +41,13 @@ export default class LoginService {
                 'Content-Type': 'application/json'
             },
             params: {
-                ip: ipAddr,
                 email: email,
                 pass: password
             }
         }).then(res => {
             return this.createUser(res.data)
         }).catch(err => {
-            console.log(err);
+            return err;
         });
     }
 
@@ -69,15 +63,14 @@ export default class LoginService {
                 username: username
             }
         }).then(res => {
-            console.log('User created success')
-            console.log(res)
+            return res;
         }).catch(err => {
-            console.log(err);
+            return err;
         });
     }
 
     //just save cookie, only return success/fail
-    async storeCookie(userId, ipAddr) {
+    async storeCookie(userId, email) {
         await axios.get(Config.apiUrl + '/store_cookie', {
             crossdomain: true,
             withCredentials: true,
@@ -86,17 +79,17 @@ export default class LoginService {
             },
             params: {
                 id: userId,
-                ip: ipAddr
+                email: email
             }
         }).then(res => {
             return res;
         }).catch(err => {
-            console.log(err);
+            return err;
         });
     }
 
     //returns a user
-    async checkCookie(ipAddr) {
+    async checkCookie() {
         return await axios.get(Config.apiUrl + '/check_cookie', {
             crossdomain: true,
             withCredentials: true,
@@ -104,13 +97,11 @@ export default class LoginService {
                 'Content-Type': 'application/json'
             },
             params: {
-                ip: ipAddr
             }
         }).then(res => {
-            console.log(this.createUser(res.data))
             return this.createUser(res.data)
         }).catch(err => {
-            console.log(err);
+            return err;
         });
     }
 
@@ -125,7 +116,7 @@ export default class LoginService {
         }).then(res => {
             return res
         }).catch(err => {
-            console.log(err);
+            return err;
         });
     }
 

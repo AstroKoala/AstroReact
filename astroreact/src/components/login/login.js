@@ -10,19 +10,12 @@ export default class Login extends React.Component {
 
     constructor(props) {
         super(props);
-        console.log(props)
         if (props.id)
             props.history.push("/");
         this.state = {
             email: "email",
             password: "password",
         };
-    }
-
-    UNSAFE_componentWillReceiveProps(e) {
-        this.setState({ ...this.state, ...e });
-        if (e.id)
-            this.props.history.push("/");
     }
 
     handleEmailChange = (e) => {
@@ -38,20 +31,31 @@ export default class Login extends React.Component {
         if (this.state.email === '' || this.state.password === '') {
             console.log('Bad user/pass')
         } else {
-            await this.loginService.login(this.state.email, this.state.password, await this.loginService.ipLookUp())
-                .then(async res => {
-                    this.props.handleuser(res);
-                    this.props.history.push("/");
-                    this.loginService.storeCookie(res.id, res.ipAddress)
+            await this.loginService.login(this.state.email, this.state.password)
+                .then(res => {
+                    if (res.id > 0) {
+                        this.props.handleuser(res);
+                        this.props.history.push("/");
+                        this.loginService.storeCookie(res.id, this.state.email)
+                    } else {
+                        this.setState({
+                            email: "",
+                            password: ""
+                        })
+                        //TODO: separate incorrect vs internal err
+                        swal({
+                            title: "Login Failed",
+                            text: "Incorrect email and/or password.",
+                            icon: "error",
+                            timer: 2200,
+                            button: false
+                        })
+                    }
                 })
-                .catch(res => {
-                    this.setState({
-                        email: "",
-                        password: ""
-                    })
+                .catch(err => {
                     swal({
                         title: "Uh-Oh",
-                        text: "Incorrect email and/or password.",
+                        text: "Internal error, please try again in a little bit.",
                         icon: "error",
                         timer: 2200,
                         button: false
@@ -63,33 +67,13 @@ export default class Login extends React.Component {
     render() {
         return (
             <form onSubmit={this.handleLogin}>
-                {/* <input type='text' onChange={this.props.ourInputFunction()}></input> */}
-                <input type="text" name="email" placeholder="Email" value={this.state.email} onChange={this.handleEmailChange} />
+                <input type="text" name="email" placeholder="email" value={this.state.email} onChange={this.handleEmailChange} />
                 <br></br>
-                <input handleuser={this.handler} type="password" name="password" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} />
+                <input handleuser={this.handler} type="password" name="password" placeholder="password" value={this.state.password} onChange={this.handlePasswordChange} />
                 <br></br>
                 <button type="submit">Login</button>
             </form>
         );
     }
 
-    // async AlertDismissibleExample() {
-    //     const [show, setShow] = React.useState(true);
-
-    //     if (show) {
-    //         return (
-    //             <Alert variant="danger" onClose={() => setShow(false)} dismissible>
-    //                 <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
-    //                 <p>
-    //                     Change this and that and try again. Duis mollis, est non commodo
-    //                     luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.
-    //                     Cras mattis consectetur purus sit amet fermentum.
-    //         </p>
-    //             </Alert>
-    //         );
-    //     }
-    //     return <Button onClick={() => setShow(true)}>Show Alert</Button>;
-    // }
-
 }
-//this.props.handleuser(usr);

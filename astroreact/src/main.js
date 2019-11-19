@@ -25,7 +25,6 @@ export default class Main extends React.Component {
         this.state = {
             loggedIn: this.checkLoggedIn(),
             //user: this.usr,
-            ipAddress: this.cookie.get('location'),
             id: this.cookie.get('id'),
             email: '',
             pass: '',
@@ -33,57 +32,24 @@ export default class Main extends React.Component {
         };
     }
 
-    async getClientIP() {
-        return await this.loginService.ipLookUp(ip => {
-            this.setState({ ipAddress: ip });
-        });
-    }
-
     async checkLoggedIn() {
         if (!this.cookie.get('key'))
             return false;
         if (this.cookie.get('id'))
             return true;
-        // let user;
-        //user = await this.checkCookie();
-        // return await this.loginService.ipLookUp()
-        //     .then(res => async () => {
-        //         let user;
-        return await this.loginService.checkCookie(await this.getClientIP()).then(res => {
+        return await this.loginService.checkCookie().then(res => {
             this.setTempCookies(res);
         });
-        // if (res === await this.loginService.checkCookie()) {
-        //         this.setTempCookies(user);
-        //         return true;
-        //     }
-        // });
-        //this.setState({ ipAddress: null, id: null, loggedIn: false, firstName: null, lastName: null });
-    }
-
-    async checkCookie() {
-        //console.log(this.cookie.getAll());
-        return this.loginService.checkCookie()
-            .then(res => {
-                return res;
-                // //console.log('user ' + res.id)
-                // //console.log('ip ' + res.ipAddress)
-                // this.setState({ id: res.id });
-            });
     }
 
 
     //This method will be sent to the child component
     handler(e) {
-        //console.log(this.state)
-        //console.log(...this.state, { ...e })
-        // this.setState(...this.state, { ...e });
-        //console.log(this.state)
         this.setState({ ...this.state, ...e });
         this.setTempCookies(e)
     }
 
     render() {
-        //console.log('reading ' + this.state.ipAddr)
         return (
             <CookiesProvider>
                 <BrowserRouter>
@@ -108,13 +74,13 @@ export default class Main extends React.Component {
                             ? < div className="content">
                                 <Switch>
                                     <Route exact path='/'
-                                        render={(props) => <Home {...props} id={this.state.id} username={this.state.username} ipAddress={this.state.ipAddress} />} />
+                                        render={(props) => <Home {...props} id={this.state.id} username={this.state.username} />} />
                                     <Route path='/stuff'
-                                        render={(props) => <Stuff {...props} id={this.state.id} username={this.state.username} ipAddress={this.state.ipAddress} />} />
+                                        render={(props) => <Stuff {...props} id={this.state.id} username={this.state.username} />} />
                                     <Route path='/contact'
-                                        render={(props) => <Contact {...props} id={this.state.id} username={this.state.username} ipAddress={this.state.ipAddress} />} />
+                                        render={(props) => <Contact {...props} id={this.state.id} username={this.state.username} />} />
                                     {/* <Route path='/login'
-                                        render={(props) => <Login {...props} id={this.state.id} firstName={this.state.firstName} lastName={this.state.lastName} ipAddress={this.state.ipAddress} handleuser={this.handler} />} /> */}
+                                        render={(props) => <Login {...props} id={this.state.id} firstName={this.state.firstName} lastName={this.state.lastName} handleuser={this.handler} />} /> */}
                                     {/* {<Route render={() => <Redirect to={{ pathname: "/" }} />} />} */}
                                     {/* <Route render={() => <h2 className="four-oh-four">404 NOT FOUND</h2>} /> */}
                                     <Route render={() => <Redirect to={{ pathname: "/" }} />} />
@@ -142,11 +108,9 @@ export default class Main extends React.Component {
         this.cookie.remove('logged', { path: "/" });
         this.cookie.remove('id', { path: "/" });
         this.cookie.remove('user_name', { path: "/" });
-        this.cookie.remove('location', { path: "/" });
-        if (!user.id)
+        if (!user || !user.id)
             return;
         this.setState({
-            ipAddress: user.ipAddress,
             id: user.id,
             loggedIn: true,
             username: user.username,
@@ -154,14 +118,12 @@ export default class Main extends React.Component {
         this.cookie.set('logged', true, { path: '/' });
         this.cookie.set("id", user.id, { path: '/' });
         this.cookie.set("user_name", user.username, { path: '/' });
-        this.cookie.set("location", user.ipAddress, { path: '/' });
     }
 
     async handleLogout() {
         return await this.loginService.deleteCookie()
             .then(res => {
                 this.setState({
-                    ipAddress: '',
                     id: '',
                     loggedIn: false,
                     username: ''
