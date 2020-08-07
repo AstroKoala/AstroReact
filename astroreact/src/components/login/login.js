@@ -11,8 +11,8 @@ export default class Login extends React.Component {
         if (props.id)
             props.history.push("/");
         this.state = {
-            email: "email",
-            password: "password",
+            email: "",
+            password: "",
         };
     }
 
@@ -26,38 +26,28 @@ export default class Login extends React.Component {
 
     handleLogin = async (e) => {
         e.preventDefault()
-        if (this.state.email === '' || this.state.password === '') {
-            console.log('Bad user/pass')
-        } else {
+        if (this.state.email !== '' || this.state.password !== '') {
             await this.loginService.login(this.state.email, this.state.password)
                 .then(res => {
                     if (res.id > 0) {
+                        // if user not verified, don't let actually log in
+                        if (res.verified === false) {
+                            this.showVerificationNotice();
+                            return;
+                        }
                         this.props.handleuser(res);
                         this.props.history.push("/");
                         this.loginService.storeCookie(res.id, this.state.email)
                     } else {
                         this.setState({
-                            email: "",
+                            //email: "",
                             password: ""
                         })
-                        //TODO: separate incorrect vs internal err
-                        swal({
-                            title: "Login Failed",
-                            text: "Incorrect email and/or password.",
-                            icon: "error",
-                            timer: 2200,
-                            button: false
-                        })
+                        this.showErrNotice("Login Failed", "Incorrect email and/or password.", "error")
                     }
                 })
                 .catch(err => {
-                    swal({
-                        title: "Uh-Oh",
-                        text: "Internal error, please try again in a little bit.",
-                        icon: "error",
-                        timer: 2200,
-                        button: false
-                    })
+                    this.showErrNotice("Uh-Oh", "Internal error, please try again in a little bit.", "error")
                 })
         }
     }
@@ -65,13 +55,45 @@ export default class Login extends React.Component {
     render() {
         return (
             <form onSubmit={this.handleLogin}>
-                <input type="text" name="email" placeholder="email" value={this.state.email} onChange={this.handleEmailChange} />
+                <input type="text" name="email" value={this.state.email} placeholder="email" onChange={this.handleEmailChange} />
                 <br></br>
-                <input handleuser={this.handler} type="password" name="password" placeholder="password" value={this.state.password} onChange={this.handlePasswordChange} />
+                <input handleuser={this.handler} type="password" name="password" value={this.state.password} placeholder="password" onChange={this.handlePasswordChange} />
                 <br></br>
                 <button type="submit">Login</button>
             </form>
         );
+    }
+
+    async showVerificationNotice() {
+        swal({
+            title: "Email Not Verified",
+            text: "Please verify your email before logging in.",
+            icon: "warning",
+            buttons: {
+                //send mail again
+                resend: {
+                    text: "Re-send verification email",
+                    value: "resend",
+                },
+                cancel: "Confirm",
+            },
+        }).then(async (value) => {
+            if (value === "resend") {
+                swal("Gotcha!", "Our email should be with you shortly!", "success", { buttons: false, timer: 2500 })
+                await this.loginService.sendVerification(this.state.email);
+            }
+        });
+    }
+
+    showErrNotice(title, text, icon) {
+        swal({
+            title: title,
+            text: text,
+            icon: icon,
+            buttons: false,
+            timer: 2500,
+            // button: button,
+        })
     }
 
 }

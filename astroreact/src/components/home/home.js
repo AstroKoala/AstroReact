@@ -1,10 +1,13 @@
 import React, { Component } from "react";
+import LoginService from 'services/login-service'
 
 export default class Home extends Component {
+    loginService = new LoginService();
     constructor(props) {
         super(props);
         if (!props.id)
             props.history.push("/login");
+        //props.history.push("/page");
     }
 
     render() {
@@ -21,7 +24,8 @@ export default class Home extends Component {
                 <p>Duis a turpis sed lacus dapibus elementum sed eu lectus.</p>
 
                 {this.props.id ? <p> Hello there, ({this.props.id}) {this.props.username}</p> : <p>not logged in</p>}
-            </div>
+                {this.props.verified ? <p>({this.props.id}) {this.props.username} verified</p> : <p>({this.props.id}) {this.props.username} NOT verified</p>}
+            </div >
         );
     }
 }

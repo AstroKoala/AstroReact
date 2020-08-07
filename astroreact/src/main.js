@@ -9,7 +9,9 @@ import Contact from "components/contact/contact";
 import Login from "components/login/login";
 import Register from 'components/register/register';
 import User from 'models/user';
+import Verification from './components/verification/verification';
 import "./index.css";
+
 
 export default class Main extends React.Component {
     loginService = new LoginService();
@@ -27,6 +29,7 @@ export default class Main extends React.Component {
             email: '',
             pass: '',
             username: this.cookie.get('user_name'),
+            verified: this.cookie.get('verified')
         };
     }
 
@@ -44,7 +47,6 @@ export default class Main extends React.Component {
     //This method will be sent to the child component
     handler(e) {
         this.setState({ ...this.state, ...e });
-        this.setTempCookies(e)
     }
 
     render() {
@@ -72,7 +74,7 @@ export default class Main extends React.Component {
                             ? < div className="content">
                                 <Switch>
                                     <Route exact path='/'
-                                        render={(props) => <Home {...props} id={this.state.id} username={this.state.username} />} />
+                                        render={(props) => <Home {...props} id={this.state.id} email={this.state.email} username={this.state.username} verified={this.state.verified} />} />
                                     <Route path='/stuff'
                                         render={(props) => <Stuff {...props} id={this.state.id} username={this.state.username} />} />
                                     <Route path='/contact'
@@ -86,6 +88,8 @@ export default class Main extends React.Component {
                             </div>
                             : < div className="content">
                                 <Switch>
+                                    {/* <Route path='/verification' render={(props) => <Verification {...props} handleuser={this.handler} />} /> */}
+                                    <Route path='/verification' render={(props) => <Verification {...props} handleuser={this.handler} />} />
                                     <Route path='/register' render={(props) => <Register {...props} handleuser={this.handler} />} />
                                     <Route path='/login' render={(props) => <Login {...props} handleuser={this.handler} />} />
                                     <Route render={() => <Redirect to={{ pathname: "/login" }} />} />
@@ -106,16 +110,19 @@ export default class Main extends React.Component {
         this.cookie.remove('logged', { path: "/" });
         this.cookie.remove('id', { path: "/" });
         this.cookie.remove('user_name', { path: "/" });
+        this.cookie.remove("verified", user.verified, { path: '/' });
         if (!user || !user.id)
             return;
         this.setState({
             id: user.id,
             loggedIn: true,
             username: user.username,
+            verified: user.verified,
         });
         this.cookie.set('logged', true, { path: '/' });
         this.cookie.set("id", user.id, { path: '/' });
         this.cookie.set("user_name", user.username, { path: '/' });
+        this.cookie.set("verified", user.verified, { path: '/' });
     }
 
     async handleLogout() {

@@ -13,7 +13,7 @@ export default class LoginService {
             .then(response => {
                 return response.query;
             })
-            .catch(err => { return err });
+            .catch(err => { throw err });
     }
 
     createUser(data) {
@@ -65,7 +65,7 @@ export default class LoginService {
         }).then(res => {
             return res;
         }).catch(err => {
-            return err;
+            throw err;
         });
     }
 
@@ -84,7 +84,7 @@ export default class LoginService {
         }).then(res => {
             return res;
         }).catch(err => {
-            return err;
+            throw err;
         });
     }
 
@@ -101,7 +101,7 @@ export default class LoginService {
         }).then(res => {
             return this.createUser(res.data)
         }).catch(err => {
-            return err;
+            throw err;
         });
     }
 
@@ -116,7 +116,47 @@ export default class LoginService {
         }).then(res => {
             return res
         }).catch(err => {
-            return err;
+            throw err;
+        });
+    }
+
+    async sendVerification(email) {
+        var verification = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+        verification = verification.substring(0, 32);
+        return await axios.get(Config.apiUrl + '/send_verification_email', {
+            crossdomain: true,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            params: {
+                email: email,
+                verification: verification
+            }
+        }).then(res => {
+            return res
+        }).catch(err => {
+            throw err;
+        });
+    }
+
+
+    async verifyEmail(email, verification) {
+        return await axios.get(Config.apiUrl + '/verify_email', {
+            crossdomain: true,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            params: {
+                email: email,
+                verification: verification
+            }
+        }).then(res => {
+            console.log(res)
+            // if (res.response.data) // TODO: REMEMBER THIS
+            return { verified: true }
+        }).catch(err => {
+            console.log(err)
+            throw err;
         });
     }
 
