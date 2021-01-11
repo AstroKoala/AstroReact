@@ -7,7 +7,6 @@ export default class Home extends Component {
         super(props);
         if (!props.id)
             props.history.push("/login");
-        //props.history.push("/page");
     }
 
     render() {

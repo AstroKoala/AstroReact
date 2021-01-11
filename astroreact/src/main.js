@@ -6,7 +6,9 @@ import LoginService from 'services/login-service'
 import Home from "components/home/home";
 import Stuff from "components/stuff/stuff";
 import Contact from "components/contact/contact";
+import Feed from "components/feed/feed";
 import Login from "components/login/login";
+import Settings from "components/settings/settings";
 import Register from 'components/register/register';
 import PassReset from 'components/pass-reset/pass-reset';
 import User from 'models/user';
@@ -30,7 +32,8 @@ export default class Main extends React.Component {
             email: '',
             pass: '',
             username: this.cookie.get('user_name'),
-            verified: this.cookie.get('verified')
+            verified: this.cookie.get('verified'),
+            showOwnPostsInFeed: (this.cookie.get('showOwnPostsInFeed') === "false") ? false : true,
         };
     }
 
@@ -59,9 +62,11 @@ export default class Main extends React.Component {
                         {this.state.id
                             ? <ul className="header">
                                 <li className="nav-left"><NavLink exact to="/">Home</NavLink></li>
-                                <li className="nav-left"><NavLink to="/stuff">Stuff</NavLink></li>
-                                <li className="nav-left"><NavLink to="/contact">Contact</NavLink></li>
+                                <li className="nav-left"><NavLink exact to="/feed">Custom Feed</NavLink></li>
+                                <li className="nav-left"><NavLink exact to="/stuff">Stuff</NavLink></li>
+                                <li className="nav-left"><NavLink exact to="/contact">Contact</NavLink></li>
                                 <li onClick={this.handleLogout} className="nav-right"><NavLink to="/login">Logout</NavLink></li>
+                                <li className="nav-right"><NavLink exact to="/settings">Settings</NavLink></li>
                             </ul>
                             : <ul className="header">
                                 {/* <li><NavLink to="/login">Home</NavLink></li>  */}
@@ -79,10 +84,10 @@ export default class Main extends React.Component {
                                         render={(props) => <Stuff {...props} id={this.state.id} username={this.state.username} />} />
                                     <Route path='/contact'
                                         render={(props) => <Contact {...props} id={this.state.id} username={this.state.username} />} />
-                                    {/* <Route path='/login'
-                                        render={(props) => <Login {...props} id={this.state.id} firstName={this.state.firstName} lastName={this.state.lastName} handleuser={this.handler} />} /> */}
-                                    {/* {<Route render={() => <Redirect to={{ pathname: "/" }} />} />} */}
-                                    {/* <Route render={() => <h2 className="four-oh-four">404 NOT FOUND</h2>} /> */}
+                                    <Route path='/feed'
+                                        render={(props) => <Feed {...props} id={this.state.id} showOwnPostsInFeed={this.state.showOwnPostsInFeed} handleShowOwnPostsInFeed={this.handleShowOwnPostsInFeed} />} />
+                                    <Route path='/settings'
+                                        render={(props) => <Settings {...props} id={this.state.id} showOwnPostsInFeed={this.state.showOwnPostsInFeed} handleShowOwnPostsInFeed={this.handleShowOwnPostsInFeed} />} />
                                     <Route render={() => <Redirect to={{ pathname: "/" }} />} />
                                 </Switch>
                             </div>
@@ -103,15 +108,16 @@ export default class Main extends React.Component {
         );
     }
 
-
-
     /* COOKIE FUNCTIONS */
+    setSingleUserCookie(userAttribute) { }
+
     // will overwrite cookies if necessary, no big deal
     setTempCookies(user) {
         this.cookie.remove('logged', { path: "/" });
         this.cookie.remove('id', { path: "/" });
         this.cookie.remove('user_name', { path: "/" });
         this.cookie.remove("verified", user.verified, { path: '/' });
+        this.cookie.remove('showOwnPostsInFeed', { path: '/' });
         if (!user || !user.id)
             return;
         this.setState({
@@ -119,11 +125,13 @@ export default class Main extends React.Component {
             loggedIn: true,
             username: user.username,
             verified: user.verified,
+            showOwnPostsInFeed: user.showOwnPostsInFeed,
         });
         this.cookie.set('logged', true, { path: '/' });
         this.cookie.set("id", user.id, { path: '/' });
         this.cookie.set("user_name", user.username, { path: '/' });
         this.cookie.set("verified", user.verified, { path: '/' });
+        this.cookie.set("verified", user.showOwnPostsInFeed, { path: '/' });
     }
 
     async handleLogout() {
@@ -137,5 +145,11 @@ export default class Main extends React.Component {
                 this.cookie.remove('key', { path: "/" });
                 this.setTempCookies(new User(null));
             });
+    }
+
+    handleShowOwnPostsInFeed = async (boolean) => {
+        this.setState({ showOwnPostsInFeed: boolean })
+        this.cookie.remove("showOwnPostsInFeed", { path: "/" });
+        this.cookie.set("showOwnPostsInFeed", boolean, { path: "/" });
     }
 }

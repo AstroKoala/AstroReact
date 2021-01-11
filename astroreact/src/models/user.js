@@ -8,6 +8,7 @@ export default class User {
     verified = false;
     username = "";
     ipAddress = "";
+    settings = {};
 
     constructor(object) {
         if (object) {
@@ -18,10 +19,11 @@ export default class User {
             this.age = object.age;
             this.verified = object.verified;
             this.username = object.user_name;
+            this.settings = object.settings;
         }
     }
 
-    buildUserFromData(id, lastName, firstName, email, age, verified, userName, ipAddress) {
+    buildUserFromData(id, lastName, firstName, email, age, verified, userName, ipAddress, settings) {
         this.id = id;
         this.lastName = lastName;
         this.firstName = firstName;
@@ -30,5 +32,6 @@ export default class User {
         this.verified = verified;
         this.userName = userName;
         this.ipAddress = ipAddress;
+        this.settings = settings;
     }
 }
