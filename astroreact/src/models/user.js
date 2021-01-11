@@ -1,24 +1,27 @@
 export default class User {
-    id;
-    age;
-    lastName;
-    firstName;
-    email;
-    pass;
-    verified;
-    username;
-    ipAddress;
+    id = 0;
+    age = 0;
+    lastName = "";
+    firstName = "";
+    email = "";
+    pass = "";
+    verified = false;
+    username = "";
+    ipAddress = "";
 
-    User(
-        id,
-        lastName,
-        firstName,
-        email,
-        age,
-        verified,
-        userName,
-        ipAddress
-    ) {
+    constructor(object) {
+        if (object) {
+            this.id = object.id;
+            this.lastName = object.last_name;
+            this.firstName = object.first_name;
+            this.email = object.email;
+            this.age = object.age;
+            this.verified = object.verified;
+            this.username = object.user_name;
+        }
+    }
+
+    buildUserFromData(id, lastName, firstName, email, age, verified, userName, ipAddress) {
         this.id = id;
         this.lastName = lastName;
         this.firstName = firstName;

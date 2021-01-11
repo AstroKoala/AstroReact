@@ -8,6 +8,7 @@ import Stuff from "components/stuff/stuff";
 import Contact from "components/contact/contact";
 import Login from "components/login/login";
 import Register from 'components/register/register';
+import PassReset from 'components/pass-reset/pass-reset';
 import User from 'models/user';
 import Verification from './components/verification/verification';
 import "./index.css";
@@ -63,11 +64,10 @@ export default class Main extends React.Component {
                                 <li onClick={this.handleLogout} className="nav-right"><NavLink to="/login">Logout</NavLink></li>
                             </ul>
                             : <ul className="header">
-                                {/* <li><NavLink to="/login">Home</NavLink></li> */}
-                                {/* <li><NavLink exact to="/login">Stuff</NavLink></li>
-                                <li><NavLink exact to="/login">Contact</NavLink></li> */}
-                                <li className="nav-left"><NavLink to="/register">Register</NavLink></li>}
-                                <li className="nav-left"><NavLink to="/login">Login</NavLink></li>}
+                                {/* <li><NavLink to="/login">Home</NavLink></li>  */}
+                                {/* <li><NavLink exact to="/login">Contact</NavLink></li> */}
+                                <li className="nav-left"><NavLink to="/login">Login</NavLink></li>
+                                <li className="nav-left"><NavLink to="/register">Register</NavLink></li>
                             </ul>
                         }
                         {this.state.id
@@ -91,6 +91,7 @@ export default class Main extends React.Component {
                                     {/* <Route path='/verification' render={(props) => <Verification {...props} handleuser={this.handler} />} /> */}
                                     <Route path='/verification' render={(props) => <Verification {...props} handleuser={this.handler} />} />
                                     <Route path='/register' render={(props) => <Register {...props} handleuser={this.handler} />} />
+                                    <Route path='/pass-reset' render={(props) => <PassReset {...props} handleuser={this.handler} />} />
                                     <Route path='/login' render={(props) => <Login {...props} handleuser={this.handler} />} />
                                     <Route render={() => <Redirect to={{ pathname: "/login" }} />} />
                                 </Switch>
@@ -134,7 +135,7 @@ export default class Main extends React.Component {
                     username: ''
                 });
                 this.cookie.remove('key', { path: "/" });
-                this.setTempCookies(new User());
+                this.setTempCookies(new User(null));
             });
     }
 }

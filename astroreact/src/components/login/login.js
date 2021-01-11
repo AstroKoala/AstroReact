@@ -37,7 +37,7 @@ export default class Login extends React.Component {
                         }
                         this.props.handleuser(res);
                         this.props.history.push("/");
-                        this.loginService.storeCookie(res.id, this.state.email)
+                        this.loginService.storeCookie(res.id, res.email)
                     } else {
                         this.setState({
                             //email: "",
@@ -59,9 +59,17 @@ export default class Login extends React.Component {
                 <br></br>
                 <input handleuser={this.handler} type="password" name="password" value={this.state.password} placeholder="password" onChange={this.handlePasswordChange} />
                 <br></br>
-                <button type="submit">Login</button>
+                <div>
+                    <button type="submit">Login</button>
+                    <span onClick={this.showPassReset}>Forgot Password?</span>
+                </div>
             </form>
         );
+    }
+
+    showPassReset = async (e) => {
+        e.preventDefault()
+        this.props.history.push("/pass-reset");
     }
 
     async showVerificationNotice() {

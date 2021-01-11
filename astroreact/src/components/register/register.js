@@ -61,7 +61,7 @@ export default class Register extends React.Component {
                         }).then(this.props.history.push("/login"))
                     }
                 })
-                .catch(e => {
+                .catch(() => {
                     swal({
                         title: "Failed to create account :/",
                         text: "Internal error, sorry about that.",
@@ -76,14 +76,11 @@ export default class Register extends React.Component {
     render() {
         return (
             <form onSubmit={this.handleRegister} >
-                {/* <input type='text' onChange={this.props.ourInputFunction()}></input> */}
                 <input type="text" name="email" placeholder="email" value={this.state.email} onChange={this.handleEmailChange} />
-                {/* this "form" here is just to prevent browser autofill on this specific input group */}
-                <form>
-                    <input type="password" name="password" placeholder="password" value={this.state.password} onChange={this.handlePasswordChange} />
-                </form>
+                <br></br>
+                <input type="password" name="password" placeholder="password" value={this.state.password} onChange={this.handlePasswordChange} />
+                <br></br>
                 <input type="text" name="username" placeholder="username" value={this.state.username} onChange={this.handleUsernameChange} />
-
                 <br></br>
                 <button type="submit">Register</button>
             </form>

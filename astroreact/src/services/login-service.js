@@ -16,18 +16,6 @@ export default class LoginService {
             .catch(err => { throw err });
     }
 
-    createUser(data) {
-        let user = new User();
-        user.id = data.id;
-        user.lastName = data.last_name;
-        user.firstName = data.first_name;
-        user.email = data.email;
-        user.age = data.age;
-        user.verified = data.verified;
-        user.username = data.user_name;
-        return user;
-    }
-
     handleError(err) {
         console.log(err);
     }
@@ -45,7 +33,7 @@ export default class LoginService {
                 pass: password
             }
         }).then(res => {
-            return this.createUser(res.data)
+            return new User(res.data)
         }).catch(err => {
             return err;
         });
@@ -70,7 +58,7 @@ export default class LoginService {
     }
 
     //just save cookie, only return success/fail
-    async storeCookie(userId, email) {
+    async storeCookie(userId, userEmail) {
         await axios.get(Config.apiUrl + '/store_cookie', {
             crossdomain: true,
             withCredentials: true,
@@ -79,7 +67,7 @@ export default class LoginService {
             },
             params: {
                 id: userId,
-                email: email
+                email: userEmail
             }
         }).then(res => {
             return res;
@@ -99,7 +87,7 @@ export default class LoginService {
             params: {
             }
         }).then(res => {
-            return this.createUser(res.data)
+            return new User(res.data)
         }).catch(err => {
             throw err;
         });
@@ -160,5 +148,22 @@ export default class LoginService {
         });
     }
 
+    async resetPass(email, pass) {
+        return await axios.get(Config.apiUrl + '/reset_pass', {
+            crossdomain: true,
+            withCredentials: true,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            params: {
+                email: email,
+                pass: pass,
+            }
+        }).then(res => {
+            return new User(res.data)
+        }).catch(err => {
+            return err;
+        });
+    }
 }
 
