@@ -3,10 +3,12 @@ import LoginService from 'services/login-service'
 
 export default class Home extends Component {
     loginService = new LoginService();
+
     constructor(props) {
         super(props);
-        if (!props.id)
-            props.history.push("/login");
+        this.state = {
+            user: props.user
+        }
     }
 
     render() {
@@ -22,8 +24,8 @@ export default class Home extends Component {
 
                 <p>Duis a turpis sed lacus dapibus elementum sed eu lectus.</p>
 
-                {this.props.id ? <p> Hello there, ({this.props.id}) {this.props.username}</p> : <p>not logged in</p>}
-                {this.props.verified ? <p>({this.props.id}) {this.props.username} verified</p> : <p>({this.props.id}) {this.props.username} NOT verified</p>}
+                {this.props.user.id ? <p> Hello there, ({this.props.user.id}) {this.props.user.username}</p> : <p>not logged in</p>}
+                {this.props.user.verified ? <p>({this.props.user.id}) {this.props.user.username} verified</p> : <p>({this.props.user.id}) {this.props.user.username} NOT verified</p>}
             </div >
         );
     }

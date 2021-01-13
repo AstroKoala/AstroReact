@@ -8,8 +8,6 @@ export default class PassReset extends React.Component {
 
     constructor(props) {
         super(props);
-        if (props.id)
-            props.history.push("/");
         this.state = {
             email: "",
             pass: "",
@@ -38,7 +36,7 @@ export default class PassReset extends React.Component {
                 .then(res => {
                     this.props.handleuser(res);
                     this.loginService.storeCookie(res.id, res.email)
-                    this.showAlertNotice("Password Reset Successfully", "No need to log in again, we've taken care' of it for you!", "success")
+                    this.showAlertNotice("Password Reset Successfully", "No need to log in again, we've taken care of it for you!", "success")
                 })
                 .catch(err => {
                     this.showAlertNotice("Uh-Oh", "Internal error, please try again in a little bit.", "error")

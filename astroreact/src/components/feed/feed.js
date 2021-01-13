@@ -1,71 +1,37 @@
 import React, { Component } from "react";
 import PostService from 'services/post-service'
 import Post from 'models/post';
+// import PulseLoader from "react-spinners/PulseLoader";
 
 
-export default class Contact extends Component {
+export default class Feed extends Component {
     PostService = new PostService();
 
     constructor(props) {
         super(props);
-        if (props.id === 0) {
-            props.history.push("/login");
-        }
         this.state = {
-            id: props.id,
-            inId: 0,
-            posts: [],
-            showOwnPostsInFeed: props.showOwnPostsInFeed
+            posts: []
         }
     }
 
-    UNSAFE_componentWillMount() {
-        this.getPersonalizedFeed(this.state.showOwnPostsInFeed)
-    }
-
-    handleInIdChange = (e) => {
-        this.setState({ inId: e.target.value });
-    }
-
-    handleInputChange = (e) => {
-        if (e.target.className === "showOwnPostsInFeed")
-            if (this.state.showOwnPostsInFeed)
-                this.setState({ showOwnPostsInFeed: false });
-            else
-                this.setState({ showOwnPostsInFeed: true });
-        if (this.state.showOwnPostsInFeed) {
-            var arr = this.state.posts;
-            for (var i = arr.length - 1; i >= 0; --i) {
-                if (Number(arr[i].userId) === Number(this.state.id)) {
-                    arr.splice(i, 1);
-                }
-            }
-            this.forceUpdate()
-        } else {
-            this.getPersonalizedFeed(true);
-        }
-
+    async componentDidMount() {
+        await this.getPersonalizedFeed().then(() => { })
     }
 
     render() {
-        var renderedOutput = this.state.posts.map(post => <div key={post.id}>{post.body}, published by {post.postedByFirstName} {post.postedByLastName}</div>)
-        return (
-            <div>
-                <div style={{ marginTop: "auto" }}>
-                    <input className="showOwnPostsInFeed" id="showOwnPostsInFeed" checked={this.state.showOwnPostsInFeed} onChange={this.handleInputChange} type="checkbox" />
-                    <span className="showOwnPostsInFeed" onClick={this.handleInputChange}>Show your own posts in feed?</span>
+        return (<div>
+            {/* {this.state.posts.length === 0 && <div><PulseLoader size={25}></PulseLoader><span></span><br></br><br></br><br></br></div>} */}
+            {this.state.posts.map((post) => (
+                <div key={post.id}>
+                    <div>{post.body} </div>
+                    <p>published by {post.postedByFirstName} {post.postedByLastName} on {this.convertToStringMonth(post.datePosted.monthOfYear).abbrev} {post.datePosted.dayOfMonth}, {post.datePosted.year} at {this.convertToTwelveHourTime(post.datePosted.hourOfDay, post.datePosted.minuteOfHour)}</p>
                 </div>
-                <br></br>
-                <div>
-                    {renderedOutput}
-                </div>
-
-            </div >
-        );
+            ))}
+        </div>);
     }
 
-    getPersonalizedFeed = async (showOwnPostsInFeed) => {
-        await this.PostService.getPostsFromFriends(this.state.id, showOwnPostsInFeed)
+    getPersonalizedFeed = async () => {
+        await this.PostService.getPostsFromFriends(this.props.user.id, this.props.user.settings.showOwnPostsInFeed)
             .then(res => res.forEach(item => {
                 let post = new Post(item);
                 if (this.state.posts.filter(i => i.id === post.id).length === 0) {
@@ -77,4 +43,31 @@ export default class Contact extends Component {
                 this.forceUpdate();
             });
     }
+
+
+    //return string representation of 24-hour clock's hour/minute as 12-hour time, with AM/PM
+    convertToTwelveHourTime(hour, minute) {
+        let half = "AM" //assume morning unless otherwise
+        if (hour / 12 > 1) {
+            hour -= 12;
+            half = "PM"
+        }
+        if (String(minute).length === 1) minute = "0" + minute;
+        return hour + ":" + minute + " " + half;
+    }
+
+    convertToStringMonth(month) {
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+        const monthAbbrevs = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"
+        ];
+        const obj = {
+            name: monthNames[month - 1],
+            abbrev: monthAbbrevs[month - 1]
+        }
+        return obj;
+    }
 }
+

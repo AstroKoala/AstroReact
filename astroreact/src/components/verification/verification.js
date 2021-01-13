@@ -38,7 +38,7 @@ export default class verification extends React.Component {
                             .then((res) => {
                                 swal("Verified", "Thank you for verifying! You should be redirected in just a sec.", "success", { buttons: false, timer: 2200 })
                                     .then(() => {
-                                        user.verified = res; // should just overwrite "verified" variable with T or F
+                                        user = res; // should just overwrite "verified" variable with T or F
                                         this.props.handleuser(user);
                                         this.props.history.push("/");
                                         this.loginService.storeCookie(user.id, this.state.email)

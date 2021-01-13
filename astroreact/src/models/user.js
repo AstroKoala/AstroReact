@@ -1,3 +1,4 @@
+import Settings from 'models/settings';
 export default class User {
     id = 0;
     age = 0;
@@ -8,7 +9,7 @@ export default class User {
     verified = false;
     username = "";
     ipAddress = "";
-    settings = {};
+    settings = new Settings(null);
 
     constructor(object) {
         if (object) {

@@ -8,8 +8,6 @@ export default class Register extends React.Component {
 
     constructor(props) {
         super(props);
-        if (props.id)
-            props.history.push("/");
         this.state = {
             email: "",
             password: "",

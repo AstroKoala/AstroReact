@@ -59,7 +59,7 @@ export default class LoginService {
 
     //just save cookie, only return success/fail
     async storeCookie(userId, userEmail) {
-        await axios.get(Config.apiUrl + '/store_cookie', {
+        return await axios.get(Config.apiUrl + '/store_cookie', {
             crossdomain: true,
             withCredentials: true,
             headers: {
@@ -77,7 +77,7 @@ export default class LoginService {
     }
 
     //returns a user
-    async checkCookie() {
+    async checkCookie(key) {
         return await axios.get(Config.apiUrl + '/check_cookie', {
             crossdomain: true,
             withCredentials: true,
@@ -85,6 +85,7 @@ export default class LoginService {
                 'Content-Type': 'application/json'
             },
             params: {
+                cookie: key
             }
         }).then(res => {
             return new User(res.data)
@@ -93,16 +94,19 @@ export default class LoginService {
         });
     }
 
-
-    async deleteCookie() {
+    async deleteCookie(key) {
         return await axios.get(Config.apiUrl + '/delete_cookie', {
             crossdomain: true,
             withCredentials: true,
             headers: {
                 'Content-Type': 'application/json'
             },
+            params: {
+                cookie: key
+            }
         }).then(res => {
-            return res
+            console.log(res)
+            return res;
         }).catch(err => {
             throw err;
         });
@@ -140,8 +144,7 @@ export default class LoginService {
             }
         }).then(res => {
             console.log(res)
-            // if (res.response.data) // TODO: REMEMBER THIS
-            return { verified: true }
+            return new User(res.data)
         }).catch(err => {
             console.log(err)
             throw err;

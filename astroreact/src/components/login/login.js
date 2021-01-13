@@ -8,11 +8,11 @@ export default class Login extends React.Component {
 
     constructor(props) {
         super(props);
-        if (props.id)
-            props.history.push("/");
+        if (props.user.id > 0)
+            props.history.push('/')
         this.state = {
             email: "",
-            password: "",
+            password: ""
         };
     }
 
@@ -29,20 +29,18 @@ export default class Login extends React.Component {
         if (this.state.email !== '' || this.state.password !== '') {
             await this.loginService.login(this.state.email, this.state.password)
                 .then(res => {
-                    if (res.id > 0) {
+                    if (res.id !== 0) {
                         // if user not verified, don't let actually log in
                         if (res.verified === false) {
                             this.showVerificationNotice();
                             return;
                         }
-                        this.props.handleuser(res);
+                        this.props.handleuser({ user: res });
+                        // this.props.handleuser({ loggedIn: true });
                         this.props.history.push("/");
                         this.loginService.storeCookie(res.id, res.email)
                     } else {
-                        this.setState({
-                            //email: "",
-                            password: ""
-                        })
+                        this.setState({ password: "" })
                         this.showErrNotice("Login Failed", "Incorrect email and/or password.", "error")
                     }
                 })

@@ -8,18 +8,21 @@ export default class PostService {
         console.log(err);
     }
 
-    async getPostsFromFriends(userId, showOwnPostsInFeed) {
+    async getPostsFromFriends(id, bool) {
         return await axios.get(this.url + '/get_posts_from_friends', {
             crossdomain: true,
-            headers: { 'Content-Type': 'application/json' },
+            withCredentials: true,
+            headers: {
+                'Content-Type': 'application/json'
+            },
             params: {
-                id: userId,
-                showSelf: showOwnPostsInFeed
+                uid: id,
+                showSelf: bool
             }
         }).then(res => {
             return res.data;
         }).catch(err => {
-            return err;
+            this.handleError(err)
         });
     }
 }

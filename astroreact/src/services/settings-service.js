@@ -8,15 +8,19 @@ export default class SettingsService {
         console.log(err);
     }
 
-    //TODO: implement
-    async saveSettings() {
-        return await axios.get(this.url + '/get_posts_from_friends', {
+    async saveSettings(user) {
+        return await axios.get(this.url + '/save_settings', {
             crossdomain: true,
             headers: { 'Content-Type': 'application/json' },
-            params: {}
+            params: {
+                uid: user.id,
+                settings: user.settings.showOwnPostsInFeed
+            }
         }).then(res => {
-            return res.data;
-        }).catch(err => { this.handleError(err) });
+            return res;
+        }).catch(err => {
+            return err;
+        });
     }
 
     //TODO: implement
@@ -26,7 +30,7 @@ export default class SettingsService {
             headers: { 'Content-Type': 'application/json' },
             params: {}
         }).then(res => {
-            return res.data;
+            return res;
         }).catch(err => { this.handleError(err) });
     }
 }

@@ -11,8 +11,9 @@ import Login from "components/login/login";
 import Settings from "components/settings/settings";
 import Register from 'components/register/register';
 import PassReset from 'components/pass-reset/pass-reset';
-import User from 'models/user';
 import Verification from './components/verification/verification';
+import User from 'models/user';
+
 import "./index.css";
 
 
@@ -23,29 +24,25 @@ export default class Main extends React.Component {
     constructor(props) {
         super(props)
         this.handler = this.handler.bind(this);
+        this.handleSettingsChange = this.handler.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
-
-        // Set some state
         this.state = {
-            loggedIn: this.checkLoggedIn(),
-            id: this.cookie.get('id'),
-            email: '',
-            pass: '',
-            username: this.cookie.get('user_name'),
-            verified: this.cookie.get('verified'),
-            showOwnPostsInFeed: (this.cookie.get('showOwnPostsInFeed') === "false") ? false : true,
+            user: new User(null)
         };
+        this.checkLoggedIn()
     }
 
     async checkLoggedIn() {
         if (!this.cookie.get('key'))
-            return false;
-        if (this.cookie.get('id'))
-            return true;
-        return await this.loginService.checkCookie().then(res => {
-            this.setTempCookies(res);
-        });
+            return new User(null);
+        else
+            return this.loginService.checkCookie(this.cookie.get('key'))
+                .then(res => {
+                    this.state.user = res
+                    this.forceUpdate()
+                });
     }
+
 
 
     //This method will be sent to the child component
@@ -53,13 +50,20 @@ export default class Main extends React.Component {
         this.setState({ ...this.state, ...e });
     }
 
+    handleSettingsChange(e) {
+        this.setState({ ...this.state.user.settings, ...e });
+    }
+
+    rememberPage(e) {
+        //implement cookie to store current page
+    }
+
     render() {
         return (
             <CookiesProvider>
                 <BrowserRouter>
                     <div>
-                        <h1>SPA</h1>
-                        {this.state.id
+                        {this.state.user.id > 0
                             ? <ul className="header">
                                 <li className="nav-left"><NavLink exact to="/">Home</NavLink></li>
                                 <li className="nav-left"><NavLink exact to="/feed">Custom Feed</NavLink></li>
@@ -69,35 +73,32 @@ export default class Main extends React.Component {
                                 <li className="nav-right"><NavLink exact to="/settings">Settings</NavLink></li>
                             </ul>
                             : <ul className="header">
-                                {/* <li><NavLink to="/login">Home</NavLink></li>  */}
-                                {/* <li><NavLink exact to="/login">Contact</NavLink></li> */}
                                 <li className="nav-left"><NavLink to="/login">Login</NavLink></li>
                                 <li className="nav-left"><NavLink to="/register">Register</NavLink></li>
                             </ul>
                         }
-                        {this.state.id
+                        {this.state.user.id > 0
                             ? < div className="content">
                                 <Switch>
                                     <Route exact path='/'
-                                        render={(props) => <Home {...props} id={this.state.id} email={this.state.email} username={this.state.username} verified={this.state.verified} />} />
+                                        render={(props) => <Home {...props} user={this.state.user} />} />
                                     <Route path='/stuff'
-                                        render={(props) => <Stuff {...props} id={this.state.id} username={this.state.username} />} />
+                                        render={(props) => <Stuff {...props} user={this.state.user} />} />
                                     <Route path='/contact'
-                                        render={(props) => <Contact {...props} id={this.state.id} username={this.state.username} />} />
+                                        render={(props) => <Contact {...props} user={this.state.user} />} />
                                     <Route path='/feed'
-                                        render={(props) => <Feed {...props} id={this.state.id} showOwnPostsInFeed={this.state.showOwnPostsInFeed} handleShowOwnPostsInFeed={this.handleShowOwnPostsInFeed} />} />
+                                        render={(props) => <Feed {...props} user={this.state.user} />} />
                                     <Route path='/settings'
-                                        render={(props) => <Settings {...props} id={this.state.id} showOwnPostsInFeed={this.state.showOwnPostsInFeed} handleShowOwnPostsInFeed={this.handleShowOwnPostsInFeed} />} />
+                                        render={(props) => <Settings {...props} user={this.state.user} handler={this.handler} handleSettingsChange={this.handleSettingsChange} />} />
                                     <Route render={() => <Redirect to={{ pathname: "/" }} />} />
                                 </Switch>
                             </div>
                             : < div className="content">
                                 <Switch>
-                                    {/* <Route path='/verification' render={(props) => <Verification {...props} handleuser={this.handler} />} /> */}
-                                    <Route path='/verification' render={(props) => <Verification {...props} handleuser={this.handler} />} />
-                                    <Route path='/register' render={(props) => <Register {...props} handleuser={this.handler} />} />
-                                    <Route path='/pass-reset' render={(props) => <PassReset {...props} handleuser={this.handler} />} />
-                                    <Route path='/login' render={(props) => <Login {...props} handleuser={this.handler} />} />
+                                    <Route path='/verification' render={(props) => <Verification {...props} user={this.state.user} handleuser={this.handler} />} />
+                                    <Route path='/register' render={(props) => <Register {...props} user={this.state.user} handleuser={this.handler} />} />
+                                    <Route path='/pass-reset' render={(props) => <PassReset {...props} user={this.state.user} handleuser={this.handler} />} />
+                                    <Route path='/login' render={(props) => <Login {...props} user={this.state.user} handleuser={this.handler} />} />
                                     <Route render={() => <Redirect to={{ pathname: "/login" }} />} />
                                 </Switch>
                             </div>
@@ -108,42 +109,16 @@ export default class Main extends React.Component {
         );
     }
 
-    /* COOKIE FUNCTIONS */
-    setSingleUserCookie(userAttribute) { }
-
-    // will overwrite cookies if necessary, no big deal
-    setTempCookies(user) {
-        this.cookie.remove('logged', { path: "/" });
-        this.cookie.remove('id', { path: "/" });
-        this.cookie.remove('user_name', { path: "/" });
-        this.cookie.remove("verified", user.verified, { path: '/' });
-        this.cookie.remove('showOwnPostsInFeed', { path: '/' });
-        if (!user || !user.id)
-            return;
-        this.setState({
-            id: user.id,
-            loggedIn: true,
-            username: user.username,
-            verified: user.verified,
-            showOwnPostsInFeed: user.showOwnPostsInFeed,
-        });
-        this.cookie.set('logged', true, { path: '/' });
-        this.cookie.set("id", user.id, { path: '/' });
-        this.cookie.set("user_name", user.username, { path: '/' });
-        this.cookie.set("verified", user.verified, { path: '/' });
-        this.cookie.set("verified", user.showOwnPostsInFeed, { path: '/' });
-    }
-
     async handleLogout() {
-        return await this.loginService.deleteCookie()
-            .then(res => {
+        return await this.loginService.deleteCookie(this.cookie.get('key'))
+            .then(() => {
                 this.setState({
-                    id: '',
                     loggedIn: false,
-                    username: ''
+                    user: new User(null),
                 });
-                this.cookie.remove('key', { path: "/" });
-                this.setTempCookies(new User(null));
+            })
+            .catch(err => {
+                throw err;
             });
     }
 
